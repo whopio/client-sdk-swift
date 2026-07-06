@@ -14,6 +14,7 @@ let package = Package(
     products: [
         .library(
             name: "LiveKit",
+            type: .dynamic,
             targets: ["LiveKit"]
         ),
     ],
