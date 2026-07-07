@@ -43,6 +43,7 @@ mkdir -p "$BUILD/asm" "$WRAP/Sources"
 SRC="$BUILD/src"
 rsync -a --exclude .git --exclude .xcframework-build "$ROOT/" "$SRC/"
 cp "$SRC/Package.source.swift" "$SRC/Package.swift"
+rm -f "$SRC"/Package@swift-*.swift  # ensure the source manifest wins for every toolchain
 
 cat > "$WRAP/project.yml" <<YML
 name: LiveKitWrap

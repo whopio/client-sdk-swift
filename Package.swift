@@ -34,7 +34,7 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "LiveKit",
-            url: "https://github.com/whopio/client-sdk-swift/releases/download/2.13.2-binary.1/LiveKit.xcframework.zip",
+            url: "https://github.com/whopio/client-sdk-swift/releases/download/2.13.2-binary.2/LiveKit.xcframework.zip",
             checksum: "c2d84313cd0eea9cfa32fa3650c5586f11e6b3bead54fee3e69fa44531509852"
         ),
         .target(
