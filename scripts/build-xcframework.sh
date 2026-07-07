@@ -18,9 +18,10 @@
 #     are `internal import`ed in LiveKit's sources so they stay hidden + absorbed.
 #
 # Result: LiveKit.framework statically absorbs SwiftProtobuf, LKObjCHelpers and
-# the Rust liblivekit_uniffi.a; it links LiveKitWebRTC.framework dynamically via
-# @rpath (NOT absorbed). Consumers must also embed LiveKitWebRTC.framework — the
-# package's LiveKitWebRTCShim target expresses that so SwiftPM does it for them.
+# the uniffi Swift bindings; it links LiveKitWebRTC.framework and
+# RustLiveKitUniFFI.framework dynamically via @rpath (NOT absorbed — uniffi 0.0.6
+# ships the Rust lib as a ~0.9MB dynamic framework, avoiding the 0.0.5 static-.a
+# bindgen bloat). Consumers embed both external frameworks via the shim target.
 #
 # Build and consume with the SAME Xcode/Swift toolchain (module format tracks the
 # compiler; the monorepo pins it via .xcode-version). Requires xcodegen.
@@ -89,7 +90,7 @@ make_framework() {
     -Xlinker -rpath -Xlinker "@executable_path/Frameworks" \
     -Wl,-no_warn_duplicate_libraries \
     "$prod/LiveKit.o" "$prod/LKObjCHelpers.o" "$prod/LiveKitUniFFI.o" "$prod/SwiftProtobuf.o" \
-    -llivekit_uniffi -framework LiveKitWebRTC \
+    -framework LiveKitWebRTC -framework RustLiveKitUniFFI \
     -o "$fw/LiveKit"
   "$STRIP" -x "$fw/LiveKit"
 
