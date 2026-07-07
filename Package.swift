@@ -3,6 +3,17 @@
 
 import PackageDescription
 
+// Prebuilt distribution of the LiveKit Swift SDK.
+//
+// `LiveKit` is shipped as a dynamic binary xcframework so it can be embedded
+// once in the host app and shared with app extensions (e.g. the broadcast
+// upload extension) via @rpath, instead of being statically linked into every
+// binary. swift-protobuf, LKObjCHelpers and the Rust UniFFI static lib are
+// absorbed into the framework; LiveKitWebRTC stays an external dynamic
+// framework (linked via the shim below so it is embedded alongside LiveKit).
+//
+// The module format is NOT evolution-stable: build and consume with the same
+// Xcode/Swift toolchain. Regenerate with scripts/build-xcframework.sh.
 let package = Package(
     name: "LiveKit",
     platforms: [
@@ -14,71 +25,24 @@ let package = Package(
     products: [
         .library(
             name: "LiveKit",
-            type: .dynamic,
-            targets: ["LiveKit"]
+            targets: ["LiveKit", "LiveKitWebRTCShim"]
         ),
     ],
     dependencies: [
-        // LK-Prefixed Dynamic WebRTC XCFramework
         .package(url: "https://github.com/livekit/webrtc-xcframework.git", exact: "144.7559.03"),
-        .package(url: "https://github.com/livekit/livekit-uniffi-xcframework.git", exact: "0.0.5"),
-        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.31.0"),
-        // Only used for DocC generation
-        .package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.3.0"),
     ],
     targets: [
-        .target(
-            name: "LKObjCHelpers",
-            publicHeadersPath: "include"
+        .binaryTarget(
+            name: "LiveKit",
+            url: "https://github.com/whopio/client-sdk-swift/releases/download/2.13.2-binary.1/LiveKit.xcframework.zip",
+            checksum: "c2d84313cd0eea9cfa32fa3650c5586f11e6b3bead54fee3e69fa44531509852"
         ),
         .target(
-            name: "LiveKit",
+            name: "LiveKitWebRTCShim",
             dependencies: [
                 .product(name: "LiveKitWebRTC", package: "webrtc-xcframework"),
-                .product(name: "LiveKitUniFFI", package: "livekit-uniffi-xcframework"),
-                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-                "LKObjCHelpers",
             ],
-            exclude: [
-                "Broadcast/NOTICE",
-            ],
-            resources: [
-                .process("PrivacyInfo.xcprivacy"),
-            ],
-            swiftSettings: [
-                .enableExperimentalFeature("AccessLevelOnImport"),
-            ]
+            path: "Sources/LiveKitWebRTCShim"
         ),
-        .target(
-            name: "LiveKitTestSupport",
-            dependencies: [
-                "LiveKit",
-            ],
-            path: "Tests/LiveKitTestSupport"
-        ),
-        .testTarget(
-            name: "LiveKitCoreTests",
-            dependencies: [
-                "LiveKit",
-                "LiveKitTestSupport",
-            ]
-        ),
-        .testTarget(
-            name: "LiveKitAudioTests",
-            dependencies: [
-                "LiveKit",
-                "LiveKitTestSupport",
-            ]
-        ),
-        .testTarget(
-            name: "LiveKitObjCTests",
-            dependencies: [
-                "LiveKit",
-                "LiveKitTestSupport",
-            ]
-        ),
-    ],
-    swiftLanguageVersions: [
-        .v5,
     ]
 )
