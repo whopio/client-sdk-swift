@@ -94,12 +94,18 @@ make_framework() {
     -o "$fw/LiveKit"
   "$STRIP" -x "$fw/LiveKit"
 
+  # Ship ONLY the .swiftinterface, NOT the binary .swiftmodule. The binary
+  # module serializes LiveKit's `internal import`s (LKObjCHelpers, LiveKitUniFFI)
+  # as required modules and bakes in absolute -fmodule-file/-fmodule-map paths
+  # from this build machine — non-redistributable. Under build-for-testing
+  # (ENABLE_TESTABILITY) Xcode prefers the binary module over the interface and
+  # then fails consumers with "unable to resolve module dependency". The
+  # evolution .swiftinterface elides those internal imports, so shipping only it
+  # forces every consumer down the leak-free interface path.
   local m="$prod/LiveKit.swiftmodule"
   cp "$m/$swifttriple.swiftinterface"         "$fw/Modules/LiveKit.swiftmodule/"
   cp "$m/$swifttriple.private.swiftinterface" "$fw/Modules/LiveKit.swiftmodule/" 2>/dev/null || true
-  cp "$m/$swifttriple.swiftmodule"            "$fw/Modules/LiveKit.swiftmodule/"
   cp "$m/$swifttriple.swiftdoc"               "$fw/Modules/LiveKit.swiftmodule/"
-  cp "$m/$swifttriple.abi.json"               "$fw/Modules/LiveKit.swiftmodule/" 2>/dev/null || true
   [ -d "$prod/LiveKit_LiveKit.bundle" ] && cp -a "$prod/LiveKit_LiveKit.bundle" "$fw/"
 
   cat > "$fw/Info.plist" <<PLIST

@@ -36,8 +36,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "LiveKit",
-            url: "https://github.com/whopio/client-sdk-swift/releases/download/2.13.2-binary.3/LiveKit.xcframework.zip",
-            checksum: "9429b7da1b1bb61bc90d2a98cd7de142eea9de23c2b500592eca1c27be6a83ba"
+            url: "https://github.com/whopio/client-sdk-swift/releases/download/2.13.2-binary.4/LiveKit.xcframework.zip",
+            checksum: "0e1398685b1b805697659877217e064e9b42262987ac8c716c8c16d20d2ae7cd"
         ),
         .binaryTarget(
             name: "RustLiveKitUniFFI",
